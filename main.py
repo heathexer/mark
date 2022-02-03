@@ -20,6 +20,14 @@ options.limit_refresh_rate_hz = 60
 
 matrix = RGBMatrix(options = options)
 
+colors = {
+    "line": graphics.Color(200, 200, 200),
+    "time": graphics.Color(240, 240, 240),
+    "month": graphics.Color(18, 93, 152),
+    "day": graphics.Color(60, 141, 173),
+    "daysrm": graphics.Color(217, 148, 48)
+}
+
 def main():
     fc = matrix.CreateFrameCanvas()
 
@@ -39,23 +47,28 @@ def main():
         if loopCount % 60 == 0:
             now = datetime.now()
             time = now.strftime("%I:%M")
-            date = now.strftime("%b%d")
+            month = now.strftime("%b")
+            day = now.strftime("%d")
             daysUntil = (datetime(2022, 6, 9) - now).days
             lineProgress = now.timetuple().tm_yday / 365
-            dateString = f"{time}{date}{daysUntil}"
 
-        # Draw the current time
-        graphics.DrawText(fc, font, 2, 8, textColor, dateString)
+        # Draw the current time and date
+        graphics.DrawText(fc, font, 2, 8, colors["time"], time)
+        graphics.DrawText(fc, font, 36, 8, colors["month"], month)
+        graphics.DrawText(fc, font, 53, 8, colors["day"], day)
+
+        # Draw the days remaining
+        graphics.DrawText(fc, font, 48, 16, colors["daysrm"], f"{daysUntil}")
 
         # Draw the progress bar outline
-        graphics.DrawLine(fc, 2, 10, 61, 10, textColor)
-        graphics.DrawLine(fc, 2, 13, 61, 13, textColor)
-        graphics.DrawLine(fc, 2, 11, 2, 12, textColor)
-        graphics.DrawLine(fc, 61, 11, 61, 12, textColor)
+        graphics.DrawLine(fc, 2, 11, 45, 11, colors["line"])
+        graphics.DrawLine(fc, 2, 14, 45, 14, colors["line"])
+        graphics.DrawLine(fc, 2, 12, 2, 13, colors["line"])
+        graphics.DrawLine(fc, 45, 12, 45, 13, colors["line"])
         # Draw the progress bar
-        progress = int(3 + (60 - 3) * lineProgress)
-        graphics.DrawLine(fc, 3, 11, progress, 11, barColor)
-        graphics.DrawLine(fc, 3, 12, progress, 12, barColor)
+        progress = int(3 + (44 - 3) * lineProgress)
+        graphics.DrawLine(fc, 3, 12, progress, 12, colors["daysrm"])
+        graphics.DrawLine(fc, 3, 13, progress, 13, colors["daysrm"])
 
         fc = matrix.SwapOnVSync(fc)
         loopCount += 1
