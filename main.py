@@ -20,20 +20,12 @@ options.limit_refresh_rate_hz = 60
 
 matrix = RGBMatrix(options = options)
 
-def render_text(x, y, w, h, text, size):
-    image = Image.new("RGB", (2 * w, 2 * h), (0,0,0))
-    font = ImageFont.truetype("fonts/RobotoMono-Medium.ttf", size)
-    draw = ImageDraw.Draw(image)
-    draw.text((10, 10), text, (255, 255, 255), font=font)
-    image = image.thumbnail((w, h), Image.ANTIALIAS)
-
-    matrix.setImage(image, x, y)
-
 def main():
     fc = matrix.CreateFrameCanvas()
 
     font = graphics.Font()
-    font.LoadFont("/src/rpi-rgb-led-matrix/fonts/4x6.bdf")
+    font.LoadFont("/src/rpi-rgb-led-matrix/fonts/5x7.bdf")
+
 
     textColor = graphics.Color(100, 100, 100)
     barColor = graphics.Color(0, 100, 0)
@@ -43,8 +35,6 @@ def main():
     while True:
         fc.Clear()
 
-        render_text(16, 32, 32, 16, 'AAAAAAAAAAAA', 10)
-
         # Update the current date
         if loopCount % 60 == 0:
             now = datetime.now()
@@ -52,7 +42,7 @@ def main():
             date = now.strftime("%b%d")
             daysUntil = (datetime(2022, 6, 9) - now).days
             lineProgress = now.timetuple().tm_yday / 365
-            dateString = f"{time} {date} {daysUntil}"
+            dateString = f"{time}{date}{daysUntil}"
 
         # Draw the current time
         graphics.DrawText(fc, font, 2, 8, textColor, dateString)
