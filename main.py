@@ -2,11 +2,12 @@
 import time
 import sys
 from datetime import datetime
+from PIL import Image, ImageDraw, ImageFont
 
 from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 
 options = RGBMatrixOptions()
-options.rows =32 
+options.rows = 32 
 options.cols = 64
 options.chain_length = 2
 options.parallel = 1
@@ -18,6 +19,15 @@ options.gpio_slowdown = 4
 options.limit_refresh_rate_hz = 60
 
 matrix = RGBMatrix(options = options)
+
+def render_text(x, y, w, h, text):
+    image = Image.new("RGB", (2 * w, 2 * h), (0,0,0))
+    font = ImageFont.truetype("static/RobotoMono-Medium.ttf", 10)
+    draw = ImageDraw.Draw(image)
+    draw.text((10, 10), text, (255, 255, 255), font=font)
+    image = image.thumbnail((w, h), Image.ANTIALIAS)
+
+    matrix.setImage(image, x, y)
 
 def main():
     fc = matrix.CreateFrameCanvas()
@@ -33,6 +43,8 @@ def main():
     while True:
         fc.Clear()
 
+        # cock
+        render_text(16, 32, 32, 16, 'COCK')
         # Update the current date
         if loopCount % 60 == 0:
             now = datetime.now()
