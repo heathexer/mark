@@ -14,8 +14,8 @@ class LifeWidget:
 
         self.oldboards = queue.Queue(2)
         # pretend this isn't bad
-        oldboards.put(self.board)
-        oldboards.put(self.board)
+        self.oldboards.put(self.board)
+        self.oldboards.put(self.board)
 
     def countBoard(self):
         return sum([np.roll(self.board, roll, axis=(1,0)) \
@@ -35,13 +35,12 @@ class LifeWidget:
                     newBoard[x, y] = 1 if count[x, y] == 3 else 0
 
         # Reset if state is steady sometimes
-        if(newBoard == oldboards.get()) {
-            self.board = np.random.choice([0, 0, 1], size)
-            oldboards.put(self.board)
-        } else {
+        if np.array_equal(newBoard, self.oldboards.get()):
+            self.board = np.random.choice([0, 0, 1], self.size)
+            self.oldboards.put(self.board)
+        else:
             self.board = newBoard
-            oldboards.put(self.board)
-        }
+            self.oldboards.put(newBoard)
 
     def render(self, canvas):
         self.update()
