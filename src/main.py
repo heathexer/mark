@@ -53,8 +53,10 @@ def main():
             time = now.strftime("%-I:%M")
             month = now.strftime("%b")
             day = now.strftime("%-d")
-            daysUntil = (datetime(2022, 6, 9) - now).days
-            lineProgress = now.timetuple().tm_yday / 365
+            startDate = datetime(2022, 1, 3)
+            endDate = datetime(2022, 3, 11)
+            daysUntil = (endDate - now).days
+            lineProgress = (now - startDate).days / (endDate - startDate).days
 
         # Draw the current time and date
         graphics.DrawText(fc, font, 2, 8, colors["time"], time)
@@ -70,7 +72,7 @@ def main():
         graphics.DrawLine(fc, 2, 12, 2, 13, colors["line"])
         graphics.DrawLine(fc, 45, 12, 45, 13, colors["line"])
         # Draw the progress bar
-        progress = int(3 + (44 - 3) * lineProgress)
+        progress = int(3 + (44 - 3) * min(1, lineProgress))
         graphics.DrawLine(fc, 3, 12, progress, 12, colors["daysrm"])
         graphics.DrawLine(fc, 3, 13, progress, 13, colors["daysrm"])
 
