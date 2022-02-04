@@ -1,4 +1,5 @@
 import numpy as np
+import queue
 from rgbmatrix import graphics
 
 class LifeWidget:
@@ -10,6 +11,11 @@ class LifeWidget:
         self.deadColor = graphics.Color(0, 0, 0)
 
         self.board = np.random.choice([0, 0, 1], size)
+
+        self.oldboards = queue.Queue(2)
+        # pretend this isn't bad
+        oldboards.put(self.board)
+        oldboards.put(self.board)
 
     def countBoard(self):
         return sum([np.roll(self.board, roll, axis=(1,0)) \
@@ -28,7 +34,14 @@ class LifeWidget:
                 else:
                     newBoard[x, y] = 1 if count[x, y] == 3 else 0
 
-        self.board = newBoard
+        # Reset if state is steady sometimes
+        if(newBoard == oldboards.get()) {
+            self.board = np.random.choice([0, 0, 1], size)
+            oldboards.put(self.board)
+        } else {
+            self.board = newBoard
+            oldboards.put(self.board)
+        }
 
     def render(self, canvas):
         self.update()
@@ -40,5 +53,3 @@ class LifeWidget:
                                 0,
                                 255 if self.board[x,y] == 1 else 0,
                                 0)
-
-
