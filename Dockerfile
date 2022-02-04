@@ -14,7 +14,6 @@ WORKDIR /src/rpi-rgb-led-matrix
 RUN make install-python HARDWARE_DESC=adafruit-hat PYTHON=$(which python3)
 
 WORKDIR /src/app
-COPY main.py /src/app
-COPY fonts /src/app/fonts
+COPY src/* /src/app/
     
 CMD bash

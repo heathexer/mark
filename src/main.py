@@ -6,6 +6,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 
+from life import LifeWidget
+
 options = RGBMatrixOptions()
 options.rows = 32 
 options.cols = 64
@@ -40,6 +42,8 @@ def main():
 
     loopCount = 0
 
+    lifeWidget = LifeWidget((0, 16), (64, 48))
+
     while True:
         fc.Clear()
 
@@ -69,6 +73,8 @@ def main():
         progress = int(3 + (44 - 3) * lineProgress)
         graphics.DrawLine(fc, 3, 12, progress, 12, colors["daysrm"])
         graphics.DrawLine(fc, 3, 13, progress, 13, colors["daysrm"])
+
+        lifeWidget.render(fc)
 
         fc = matrix.SwapOnVSync(fc)
         loopCount += 1
