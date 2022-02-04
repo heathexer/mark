@@ -50,16 +50,16 @@ def main():
         # Update the current date
         if loopCount % 60 == 0:
             now = datetime.now()
-            time = now.strftime("%I:%M")
+            time = now.strftime("%-I:%M")
             month = now.strftime("%b")
-            day = now.strftime("%d")
+            day = now.strftime("%-d")
             daysUntil = (datetime(2022, 6, 9) - now).days
             lineProgress = now.timetuple().tm_yday / 365
 
         # Draw the current time and date
         graphics.DrawText(fc, font, 2, 8, colors["time"], time)
-        graphics.DrawText(fc, font, 36, 8, colors["month"], month)
-        graphics.DrawText(fc, font, 53, 8, colors["day"], day)
+        graphics.DrawText(fc, font, 46 - 5 * len(day), 8, colors["month"], month)
+        graphics.DrawText(fc, font, 63 - 5 * len(day), 8, colors["day"], day)
 
         # Draw the days remaining
         graphics.DrawText(fc, font, 48, 16, colors["daysrm"], f"{daysUntil}")
