@@ -13,7 +13,7 @@ RUN git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
 WORKDIR /src/rpi-rgb-led-matrix
 RUN make install-python HARDWARE_DESC=adafruit-hat PYTHON=$(which python3)
 
+COPY src /src/app
 WORKDIR /src/app
-COPY src/* /src/app/
     
 CMD bash
