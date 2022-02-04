@@ -50,7 +50,7 @@ def main():
         # Update the current date
         if loopCount % 60 == 0:
             now = datetime.now()
-            time = now.strftime("%-I:%M")
+            time = now.strftime("%-I %M")
             month = now.strftime("%b")
             day = now.strftime("%-d")
             startDate = datetime(2022, 1, 3)
@@ -58,8 +58,14 @@ def main():
             daysUntil = (endDate - now).days
             lineProgress = (now - startDate).days / (endDate - startDate).days
 
-        # Draw the current time and date
+        # Draw the current time
         graphics.DrawText(fc, font, 2, 8, colors["time"], time)
+        # Blink colon every second
+        if (loopCount % (2 * options.limit_refresh_rate_hz)) \
+            < options.limit_refresh_rate_hz:
+            graphics.DrawText(fc, font, (2 + time.len() - 3), 8, colors["time"], ":")
+
+        # Draw the current date
         graphics.DrawText(fc, font, 46 - 5 * len(day), 8, colors["month"], month)
         graphics.DrawText(fc, font, 63 - 5 * len(day), 8, colors["day"], day)
 
@@ -71,6 +77,7 @@ def main():
         graphics.DrawLine(fc, 2, 14, 45, 14, colors["line"])
         graphics.DrawLine(fc, 2, 12, 2, 13, colors["line"])
         graphics.DrawLine(fc, 45, 12, 45, 13, colors["line"])
+        
         # Draw the progress bar
         progress = int(3 + (44 - 3) * min(1, lineProgress))
         graphics.DrawLine(fc, 3, 12, progress, 12, colors["daysrm"])
