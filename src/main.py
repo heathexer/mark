@@ -18,7 +18,8 @@ options.pixel_mapper_config = "V-mapper"
 options.row_address_type = 0
 options.multiplexing = 0
 options.gpio_slowdown = 4
-options.limit_refresh_rate_hz = 60
+options.limit_refresh_rate_hz = 100
+options.show_refresh_rate = 0
 
 matrix = RGBMatrix(options = options)
 
@@ -35,6 +36,8 @@ def main():
 
     font = graphics.Font()
     font.LoadFont("/src/app/fonts/5x7.bdf")
+    timeFont = graphics.Font()
+    timeFont.LoadFont("/src/app/fonts/6x12.bdf")
 
 
     textColor = graphics.Color(100, 100, 100)
@@ -42,13 +45,13 @@ def main():
 
     loopCount = 0
 
-    lifeWidget = LifeWidget((0, 16), (64, 48))
+    lifeWidget = LifeWidget((0, 0), (64, 64))
 
     while True:
         fc.Clear()
 
         # Update the current date
-        if loopCount % 60 == 0:
+        if loopCount % 1 == 0:
             now = datetime.now()
             time = now.strftime("%-I %M")
             month = now.strftime("%b")
@@ -59,11 +62,10 @@ def main():
             lineProgress = (now - startDate).days / (endDate - startDate).days
 
         # Draw the current time
-        graphics.DrawText(fc, font, 2, 8, colors["time"], time)
+        graphics.DrawText(fc, timeFont, 2, 9, colors["time"], time)
         # Blink colon every second
-        if (loopCount % (2 * options.limit_refresh_rate_hz)) \
-            < options.limit_refresh_rate_hz:
-            graphics.DrawText(fc, font, (2 + time.len() - 3), 8, colors["time"], ":")
+        if (now.second % 2 == 0):
+            graphics.DrawText(fc, font, 2 + 6 * (len(time) - 3), 8, colors["time"], ":")
 
         # Draw the current date
         graphics.DrawText(fc, font, 46 - 5 * len(day), 8, colors["month"], month)
@@ -77,7 +79,7 @@ def main():
         graphics.DrawLine(fc, 2, 14, 45, 14, colors["line"])
         graphics.DrawLine(fc, 2, 12, 2, 13, colors["line"])
         graphics.DrawLine(fc, 45, 12, 45, 13, colors["line"])
-        
+
         # Draw the progress bar
         progress = int(3 + (44 - 3) * min(1, lineProgress))
         graphics.DrawLine(fc, 3, 12, progress, 12, colors["daysrm"])

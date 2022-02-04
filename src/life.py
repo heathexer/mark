@@ -7,7 +7,7 @@ class LifeWidget:
         self.size = size
         self.position = position
 
-        self.aliveColor = graphics.Color(0, 100, 0)
+        self.aliveColor = graphics.Color(20, 0, 0)
         self.deadColor = graphics.Color(0, 0, 0)
 
         self.board = np.random.choice([0, 0, 1], size)
@@ -49,6 +49,6 @@ class LifeWidget:
             for y in range(self.size[1]):
                 canvas.SetPixel(self.position[0] + x,
                                 self.position[1] + y, 
+                                50 if self.board[x,y] == 1 else 0,
                                 0,
-                                255 if self.board[x,y] == 1 else 0,
                                 0)
