@@ -34,7 +34,7 @@ def main():
     fc = matrix.CreateFrameCanvas()
 
     font = graphics.Font()
-    font.LoadFont("/src/rpi-rgb-led-matrix/fonts/5x7.bdf")
+    font.LoadFont("/src/app/fonts/5x7.bdf")
 
 
     textColor = graphics.Color(100, 100, 100)
