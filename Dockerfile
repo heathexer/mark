@@ -1,12 +1,23 @@
 FROM balenalib/raspberry-pi-debian:buster
 
+# Installations
 RUN apt-get -q update && apt-get install -yq --no-install-recommends \
     build-essential git \
-    vim \
-    python3-dev python3-pillow \
-    python3-numpy \
+    vim curl \
+    python3-dev python3-pillow python3-numpy \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Get Rust
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
+    --default-host armv7-unknown-linux-gnueabihf \
+    --profile minimal
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Build Rust app
+# WORKDIR /src/rs
+# RUN cargo build --release
+
+# Get rpi-rgb-matrix library
 WORKDIR /src
 RUN git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
 
