@@ -13,10 +13,6 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
     --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Build Rust app
-# WORKDIR /src/rs
-# RUN cargo build --release
-
 # Get rpi-rgb-matrix library
 WORKDIR /src
 RUN git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
@@ -26,5 +22,9 @@ RUN make install-python HARDWARE_DESC=adafruit-hat PYTHON=$(which python3)
 
 COPY src /src/app
 WORKDIR /src/app
+
+# Build Rust app
+# WORKDIR /src/app/rs
+# RUN cargo build --release
     
 CMD bash
