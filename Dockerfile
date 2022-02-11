@@ -14,14 +14,14 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Get rpi-rgb-matrix library
-WORKDIR /src
-RUN git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
+# WORKDIR /src
+# RUN git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
 
-WORKDIR /src/rpi-rgb-led-matrix
-RUN make install-python HARDWARE_DESC=adafruit-hat PYTHON=$(which python3)
+# WORKDIR /src/rpi-rgb-led-matrix
+# RUN make install-python HARDWARE_DESC=adafruit-hat PYTHON=$(which python3)
 
 COPY src /src/app
-WORKDIR /src/app
+WORKDIR /src/app/rs
 
 # Build Rust app
 # WORKDIR /src/app/rs

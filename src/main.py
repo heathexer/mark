@@ -19,7 +19,7 @@ options.row_address_type = 0
 options.multiplexing = 0
 options.gpio_slowdown = 4
 options.limit_refresh_rate_hz = 100
-options.show_refresh_rate = 0
+options.show_refresh_rate = 1
 
 matrix = RGBMatrix(options = options)
 
