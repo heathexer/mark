@@ -1,7 +1,13 @@
+#[macro_use(azip)]
+extern crate ndarray;
+
 use chrono::prelude::*;
+use life::LifeWidget;
 use rpi_led_matrix::{LedColor, LedFont, LedMatrix, LedMatrixOptions, LedRuntimeOptions};
 use std::collections::HashMap;
 use std::path::Path;
+
+pub mod life;
 
 fn main() {
     // Options
@@ -72,8 +78,12 @@ fn main() {
     let start_date = NaiveDate::from_ymd(2022, 1, 3);
     let end_date = NaiveDate::from_ymd(2022, 3, 11);
 
+    let mut lw = LifeWidget::new((0, 0), (64, 63));
+
     loop {
         canvas.clear();
+
+        lw.render(&mut canvas);
 
         let now = Utc::now().with_timezone(&Local);
         let time = now.format("%-I %M").to_string();
