@@ -22,7 +22,7 @@ impl LifeWidget {
             size: size,
             position: position,
             alive_color: LedColor {
-                red: 50,
+                red: 80,
                 green: 0,
                 blue: 0,
             },

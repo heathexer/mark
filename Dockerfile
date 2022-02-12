@@ -13,6 +13,10 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
     --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+# Set timezone
+RUN rm /etc/localtime && \
+ln -s /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+
 # Get rpi-rgb-matrix library
 # WORKDIR /src
 # RUN git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
