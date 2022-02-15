@@ -10,6 +10,7 @@ pub struct TimeWidget {
     day_color: LedColor,
     time_font: LedFont,
     date_font: LedFont,
+    now: DateTime<Local>,
 }
 
 impl TimeWidget {
@@ -36,14 +37,15 @@ impl TimeWidget {
                 .expect("Failed to load time font"),
             date_font: LedFont::new(Path::new("../fonts/5x7.bdf"))
                 .expect("Failed to load date font"),
+            now: Utc::now().with_timezone(&Local),
         }
     }
 
-    pub fn render(&self, canvas: &mut LedCanvas) {
-        let now = Utc::now().with_timezone(&Local);
-        let time = now.format("%-I %M").to_string();
-        let month = now.format("%b").to_string();
-        let day = now.format("%-d").to_string();
+    pub fn render(&mut self, canvas: &mut LedCanvas) {
+        self.now = Utc::now().with_timezone(&Local);
+        let time = self.now.format("%-I %M").to_string();
+        let month = self.now.format("%b").to_string();
+        let day = self.now.format("%-d").to_string();
 
         // Display the current time
         canvas.draw_text(
@@ -56,7 +58,7 @@ impl TimeWidget {
             false,
         );
         // Blink colon
-        if now.second() % 2 == 0 {
+        if self.now.second() % 2 == 0 {
             canvas.draw_text(
                 &self.time_font,
                 &":",
