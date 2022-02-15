@@ -6,8 +6,10 @@ use life::LifeWidget;
 use rpi_led_matrix::{LedColor, LedFont, LedMatrix, LedMatrixOptions, LedRuntimeOptions};
 use std::collections::HashMap;
 use std::path::Path;
+use time::TimeWidget;
 
 pub mod life;
+pub mod time;
 
 fn main() {
     // Options
@@ -36,30 +38,6 @@ fn main() {
             },
         ),
         (
-            "time",
-            LedColor {
-                red: 240,
-                green: 240,
-                blue: 240,
-            },
-        ),
-        (
-            "month",
-            LedColor {
-                red: 18,
-                green: 93,
-                blue: 152,
-            },
-        ),
-        (
-            "day",
-            LedColor {
-                red: 60,
-                green: 141,
-                blue: 173,
-            },
-        ),
-        (
             "daysrm",
             LedColor {
                 red: 217,
@@ -72,23 +50,22 @@ fn main() {
     let matrix = LedMatrix::new(Some(options), Some(rt_options)).unwrap();
     let mut canvas = matrix.offscreen_canvas();
 
-    let time_font = LedFont::new(Path::new("../fonts/6x12.bdf")).expect("Failed to load 6x12 font");
-    let date_font = LedFont::new(Path::new("../fonts/5x7.bdf")).expect("Failed to load 5x7 font");
-
     let start_date = NaiveDate::from_ymd(2022, 1, 3);
     let end_date = NaiveDate::from_ymd(2022, 3, 11);
 
     let mut lw = LifeWidget::new((0, 0), (64, 63));
+    let mut tw = TimeWidget::new((1, 1), (62, 8));
 
     loop {
         canvas.clear();
 
+        let date_font =
+            LedFont::new(Path::new("../fonts/5x7.bdf")).expect("Failed to load date font");
+
         lw.render(&mut canvas);
+        tw.render(&mut canvas);
 
         let now = Utc::now().with_timezone(&Local);
-        let time = now.format("%-I %M").to_string();
-        let month = now.format("%b").to_string();
-        let day = now.format("%-d").to_string();
         let days_until = end_date
             .signed_duration_since(now.naive_local().date())
             .num_days();
@@ -98,41 +75,6 @@ fn main() {
             .signed_duration_since(start_date)
             .num_days() as f64
             / end_date.signed_duration_since(start_date).num_days() as f64;
-
-        // Display the current time
-        canvas.draw_text(&time_font, &time, 2, 9, &colors["time"], 0, false);
-        // Blink colon
-        if now.second() % 2 == 0 {
-            canvas.draw_text(
-                &time_font,
-                &":",
-                2 + 6 * (time.len() as i32 - 3),
-                8,
-                &colors["time"],
-                0,
-                false,
-            );
-        }
-
-        // Display the current month and day
-        canvas.draw_text(
-            &date_font,
-            &month,
-            46 - 5 * day.len() as i32,
-            8,
-            &colors["month"],
-            0,
-            false,
-        );
-        canvas.draw_text(
-            &date_font,
-            &day,
-            63 - 5 * day.len() as i32,
-            8,
-            &colors["day"],
-            0,
-            false,
-        );
 
         // Draw the days remaining
         canvas.draw_text(
