@@ -1,3 +1,4 @@
+use crate::config::CountdownOptions;
 use chrono::prelude::*;
 use rpi_led_matrix::{LedCanvas, LedColor, LedFont};
 use std::path::Path;
@@ -13,21 +14,13 @@ pub struct CountdownWidget {
 }
 
 impl CountdownWidget {
-    pub fn new(position: (usize, usize), size: (usize, usize)) -> Self {
+    pub fn new(position: (usize, usize), size: (usize, usize), config: CountdownOptions) -> Self {
         CountdownWidget {
             position: position,
             size: size,
-            line_color: LedColor {
-                red: 200,
-                green: 200,
-                blue: 200,
-            },
-            main_color: LedColor {
-                red: 217,
-                green: 148,
-                blue: 48,
-            },
-            font: LedFont::new(Path::new("../fonts/5x7.bdf")).expect("Failed to load font"),
+            line_color: config.line_color.into(),
+            main_color: config.main_color.into(),
+            font: LedFont::new(Path::new(&config.font_path)).expect("Failed to load font"),
             start_date: NaiveDate::from_ymd(2022, 1, 3),
             end_date: NaiveDate::from_ymd(2022, 3, 11),
         }
@@ -94,9 +87,6 @@ impl CountdownWidget {
             py + sy - 4,
             &self.line_color,
         );
-        // canvas.draw_line(self.position.0, 14, 45, 14, &self.line_color);
-        // canvas.draw_line(self.position.0, 12, self.position.0, 13, &self.line_color);
-        // canvas.draw_line(45, 12, 45, 13, &self.line_color);
 
         let line_progress = px + 1 + ((px + sx - tw - 3) as f64 * f64::min(1., progress)) as i32;
         canvas.draw_line(

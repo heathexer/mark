@@ -6,8 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rpi-led-matrix = "0.4"
+rpi-led-matrix = { version = "0.4", features = ["embeddedgraphics"] }
 chrono = "0.4"
 ndarray = "0.13"
 ndarray-rand = "0.11"
 queues = "1.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+embedded-graphics-core = "0.3"

@@ -1,3 +1,4 @@
+use crate::config::TimeOptions;
 use chrono::prelude::*;
 use rpi_led_matrix::{LedCanvas, LedColor, LedFont};
 use std::path::Path;
@@ -14,28 +15,16 @@ pub struct TimeWidget {
 }
 
 impl TimeWidget {
-    pub fn new(position: (usize, usize), size: (usize, usize)) -> Self {
+    pub fn new(position: (usize, usize), size: (usize, usize), config: TimeOptions) -> Self {
         TimeWidget {
             position: position,
             size: size,
-            time_color: LedColor {
-                red: 240,
-                green: 240,
-                blue: 240,
-            },
-            month_color: LedColor {
-                red: 18,
-                green: 93,
-                blue: 152,
-            },
-            day_color: LedColor {
-                red: 60,
-                green: 141,
-                blue: 173,
-            },
-            time_font: LedFont::new(Path::new("../fonts/6x12.bdf"))
+            time_color: config.time_color.into(),
+            month_color: config.month_color.into(),
+            day_color: config.day_color.into(),
+            time_font: LedFont::new(Path::new(&config.time_font_path))
                 .expect("Failed to load time font"),
-            date_font: LedFont::new(Path::new("../fonts/5x7.bdf"))
+            date_font: LedFont::new(Path::new(&config.date_font_path))
                 .expect("Failed to load date font"),
             now: Utc::now().with_timezone(&Local),
         }

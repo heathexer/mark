@@ -1,12 +1,11 @@
-#[macro_use(azip)]
-extern crate ndarray;
-
-use chrono::prelude::*;
+use config::*;
 use countdown::CountdownWidget;
 use life::LifeWidget;
-use rpi_led_matrix::{LedColor, LedFont, LedMatrix, LedMatrixOptions, LedRuntimeOptions};
+use rpi_led_matrix::{LedMatrix, LedMatrixOptions, LedRuntimeOptions};
+use std::fs::File;
 use time::TimeWidget;
 
+pub mod config;
 pub mod countdown;
 pub mod life;
 pub mod time;
@@ -30,9 +29,13 @@ fn main() {
     let matrix = LedMatrix::new(Some(options), Some(rt_options)).unwrap();
     let mut canvas = matrix.offscreen_canvas();
 
-    let mut lw = LifeWidget::new((0, 0), (64, 63));
-    let mut tw = TimeWidget::new((1, 1), (62, 7));
-    let mut cw = CountdownWidget::new((1, 8), (62, 7));
+    let file = File::open("../config.json").expect("Failed to open config file");
+    let reader = std::io::BufReader::new(file);
+    let config: MarkConfig = serde_json::from_reader(reader).unwrap();
+
+    let mut lw = LifeWidget::new((0, 0), (64, 63), config.life_options);
+    let mut tw = TimeWidget::new((1, 1), (62, 7), config.time_options);
+    let cw = CountdownWidget::new((1, 8), (62, 7), config.countdown_options);
 
     let mut loopcount: u32 = 0;
 

@@ -1,4 +1,5 @@
-use ndarray::{s, Array, Array2, Zip};
+use crate::config::LifeOptions;
+use ndarray::{azip, s, Array, Array2, Zip};
 use ndarray_rand::rand_distr::Uniform;
 use ndarray_rand::RandomExt;
 use queues::{Buffer, IsQueue};
@@ -14,23 +15,18 @@ pub struct LifeWidget {
 }
 
 impl LifeWidget {
-    pub fn new(position: (usize, usize), size: (usize, usize)) -> Self {
-        let mut oldboards_init = Buffer::<Array2<u8>>::new(2);
-        oldboards_init.add(Array2::zeros(size));
-        oldboards_init.add(Array2::zeros(size));
+    pub fn new(position: (usize, usize), size: (usize, usize), config: LifeOptions) -> Self {
+        // How many cycles ago to check for repeating. 12 allows any assortment of 2, 3, and 4 cycle loops to be caught
+        let mut oldboards_init = Buffer::<Array2<u8>>::new(12);
+        for _ in 0..oldboards_init.capacity() {
+            oldboards_init.add(Array2::zeros(size));
+        }
+
         LifeWidget {
             size: size,
             position: position,
-            alive_color: LedColor {
-                red: 80,
-                green: 5,
-                blue: 0,
-            },
-            dead_color: LedColor {
-                red: 0,
-                green: 0,
-                blue: 0,
-            },
+            alive_color: config.alive_color.into(),
+            dead_color: config.dead_color.into(),
             board: Array::random(size, Uniform::new(0_u8, 2_u8)),
             oldboards: oldboards_init,
         }
