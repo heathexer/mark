@@ -21,8 +21,8 @@ impl CountdownWidget {
             line_color: config.line_color.into(),
             main_color: config.main_color.into(),
             font: LedFont::new(Path::new(&config.font_path)).expect("Failed to load font"),
-            start_date: NaiveDate::from_ymd(2022, 1, 3),
-            end_date: NaiveDate::from_ymd(2022, 3, 11),
+            start_date: NaiveDate::from_ymd(2022, 3, 28),
+            end_date: NaiveDate::from_ymd(2022, 6, 9),
         }
     }
 
@@ -88,7 +88,7 @@ impl CountdownWidget {
             &self.line_color,
         );
 
-        let line_progress = px + 1 + ((px + sx - tw - 3) as f64 * f64::min(1., progress)) as i32;
+        let line_progress = px + 2 + ((px + sx - tw - 5) as f64 * f64::min(0., progress)) as i32;
         canvas.draw_line(
             px + 1,
             py + sy - 3,

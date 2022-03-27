@@ -1,13 +1,16 @@
 use config::*;
 use countdown::CountdownWidget;
 use life::LifeWidget;
+use presence::PresenceWidget;
 use rpi_led_matrix::{LedMatrix, LedMatrixOptions, LedRuntimeOptions};
 use std::fs::File;
+use std::sync::Arc;
 use time::TimeWidget;
 
 pub mod config;
 pub mod countdown;
 pub mod life;
+pub mod presence;
 pub mod time;
 
 fn main() {
@@ -37,6 +40,10 @@ fn main() {
     let mut tw = TimeWidget::new((1, 1), (62, 7), config.time_options);
     let cw = CountdownWidget::new((1, 8), (62, 7), config.countdown_options);
 
+    let pw = PresenceWidget::new((0, 0), (0, 0), &config.presence_options);
+
+    pw.start_thread(config.presence_options.user_devices);
+
     let mut loopcount: u32 = 0;
 
     loop {
@@ -45,6 +52,7 @@ fn main() {
         lw.render(&mut canvas);
         tw.render(&mut canvas);
         cw.render(&mut canvas);
+        pw.render(&mut canvas);
 
         canvas = matrix.swap(canvas);
         loopcount += 1;

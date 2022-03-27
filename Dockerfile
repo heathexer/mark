@@ -28,7 +28,7 @@ COPY src /src/app
 WORKDIR /src/app/rs
 
 # Build Rust app
-# WORKDIR /src/app/rs
-# RUN cargo build --release
+RUN cargo build --release || true
+
     
-CMD bash
+CMD cargo run --release || bash

@@ -42,5 +42,15 @@
             "blue": 48
         },
         "fontPath": "../fonts/5x7.bdf"
+    },
+    "presenceOptions": {
+        "fontPath": "../fonts/5x7.bdf",
+        "username": "admin",
+        "password": "eeeeeeee",
+        "userDevices": {
+            "idk": "Cole",
+            "Pixel-6": "Heath",
+            "0E:DF:9D:67:C2:23": "Elias"
+        }
     }
 }
