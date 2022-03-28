@@ -3,25 +3,30 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::ops::{Deref, DerefMut};
 use std::path::Path;
-use std::sync::{Arc, Mutex};
+use std::sync::{
+    mpsc::{Receiver, SyncSender},
+    Arc, Mutex,
+};
 use std::thread;
 use std::time::Duration;
 
-use rpi_led_matrix::{LedCanvas, LedFont, LedMatrix, LedMatrixOptions, LedRuntimeOptions};
+use rpi_led_matrix::{LedCanvas, LedColor, LedFont};
 use scraper::{Html, Selector};
 use ureq;
 
 pub struct PresenceWidget {
-    position: (usize, usize),
-    size: (usize, usize),
+    position: (i32, i32),
+    size: (i32, i32),
     font: LedFont,
     username: Arc<String>,
     password: Arc<String>,
-    active_users: Arc<Mutex<Vec<String>>>,
+    active_users: Vec<String>,
+    user_colors: HashMap<String, LedColor>,
+    main_color: LedColor,
 }
 
 impl PresenceWidget {
-    pub fn new(position: (usize, usize), size: (usize, usize), config: &PresenceOptions) -> Self {
+    pub fn new(position: (i32, i32), size: (i32, i32), config: &PresenceOptions) -> Self {
         PresenceWidget {
             position: position,
             size: size,
@@ -29,22 +34,51 @@ impl PresenceWidget {
             username: Arc::new(config.username.clone()),
             password: Arc::new(config.password.clone()),
             active_users: Default::default(),
+            user_colors: config
+                .user_colors
+                .iter()
+                .map(|(k, v)| (k.clone(), v.into()))
+                .collect(),
+            main_color: config.main_color.into(),
         }
     }
 
-    pub fn render(&self, canvas: &mut LedCanvas) {}
+    pub fn render(&mut self, canvas: &mut LedCanvas, chan: &Receiver<Vec<String>>) {
+        // let active_names: String = self.active_users.lock().unwrap().join("\n");
+        let (sx, sy) = self.size;
+        let (px, py) = self.position;
 
-    pub fn start_thread(&self, user_devices: HashMap<String, String>) {
+        if let Ok(active_users) = chan.try_recv() {
+            self.active_users = active_users;
+        }
+
+        for (i, user) in self.active_users.iter().enumerate() {
+            canvas.draw_text(
+                &self.font,
+                &user,
+                px,
+                py + 7 * (i as i32 + 1),
+                self.user_colors.get(user).unwrap_or(&self.main_color),
+                0,
+                false,
+            );
+        }
+    }
+
+    pub fn start_thread(
+        &self,
+        user_devices: HashMap<String, String>,
+        chan: SyncSender<Vec<String>>,
+    ) {
         thread::spawn({
             let username = Arc::clone(&self.username);
             let password = Arc::clone(&self.password);
-            let active_users = Arc::clone(&self.active_users);
             move || {
                 let mut cookie = Self::get_cookie(&username, &password);
-
                 let mut loops: u32 = 0;
+
                 loop {
-                    if loops == 30 {
+                    if loops == 60 {
                         loops = 0;
                         cookie = Self::get_cookie(&username, &password);
                     }
@@ -56,14 +90,11 @@ impl PresenceWidget {
                         }
                     }
 
-                    println!("\nactive users: {:?}", out);
-
-                    let mut active_users = active_users.lock().unwrap();
-
-                    *active_users.deref_mut() = out;
+                    // println!("\nactive users: {:?}", out);
+                    chan.send(out).unwrap();
 
                     loops += 1;
-                    thread::sleep(Duration::new(10, 0));
+                    thread::sleep(Duration::new(5, 0));
                 }
             }
         });

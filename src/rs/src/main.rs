@@ -4,14 +4,16 @@ use life::LifeWidget;
 use presence::PresenceWidget;
 use rpi_led_matrix::{LedMatrix, LedMatrixOptions, LedRuntimeOptions};
 use std::fs::File;
-use std::sync::Arc;
+use std::sync::{mpsc, Arc};
 use time::TimeWidget;
+use weather::WeatherWidget;
 
 pub mod config;
 pub mod countdown;
 pub mod life;
 pub mod presence;
 pub mod time;
+pub mod weather;
 
 fn main() {
     // Options
@@ -40,11 +42,13 @@ fn main() {
     let mut tw = TimeWidget::new((1, 1), (62, 7), config.time_options);
     let cw = CountdownWidget::new((1, 8), (62, 7), config.countdown_options);
 
-    let pw = PresenceWidget::new((0, 0), (0, 0), &config.presence_options);
+    let (psender, preceiver) = mpsc::sync_channel(20);
+    let mut pw = PresenceWidget::new((1, 15), (30, 51), &config.presence_options);
+    pw.start_thread(config.presence_options.user_devices, psender);
 
-    pw.start_thread(config.presence_options.user_devices);
-
-    let mut loopcount: u32 = 0;
+    let (wsender, wreceiver) = mpsc::sync_channel(20);
+    let mut ww = WeatherWidget::new((32, 15), (30, 16), &config.weather_options);
+    ww.start_thread(wsender);
 
     loop {
         canvas.clear();
@@ -52,9 +56,9 @@ fn main() {
         lw.render(&mut canvas);
         tw.render(&mut canvas);
         cw.render(&mut canvas);
-        pw.render(&mut canvas);
+        pw.render(&mut canvas, &preceiver);
+        ww.render(&mut canvas, &wreceiver);
 
         canvas = matrix.swap(canvas);
-        loopcount += 1;
     }
 }

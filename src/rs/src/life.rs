@@ -72,7 +72,7 @@ impl LifeWidget {
         } else {
             self.board = new_board;
         }
-        self.oldboards.add(self.board.clone());
+        self.oldboards.add(self.board.clone()).unwrap();
     }
 
     pub fn render(&mut self, canvas: &mut LedCanvas) {

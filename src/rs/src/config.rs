@@ -11,9 +11,10 @@ pub struct MarkConfig {
     pub time_options: TimeOptions,
     pub countdown_options: CountdownOptions,
     pub presence_options: PresenceOptions,
+    pub weather_options: WeatherOptions,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Copy, Clone)]
 pub struct ConfigColor {
     red: u8,
     green: u8,
@@ -21,6 +22,16 @@ pub struct ConfigColor {
 }
 
 impl Into<LedColor> for ConfigColor {
+    fn into(self) -> LedColor {
+        LedColor {
+            red: self.red,
+            green: self.green,
+            blue: self.blue,
+        }
+    }
+}
+
+impl Into<LedColor> for &ConfigColor {
     fn into(self) -> LedColor {
         LedColor {
             red: self.red,
@@ -62,4 +73,19 @@ pub struct PresenceOptions {
     pub username: String,
     pub password: String,
     pub user_devices: HashMap<String, String>,
+    pub user_colors: HashMap<String, ConfigColor>,
+    pub main_color: ConfigColor,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WeatherOptions {
+    pub font_path: String,
+    pub lat: String,
+    pub lon: String,
+    pub api_key: String,
+    pub icons: HashMap<String, String>,
+    pub default_icon: String,
+    pub cold_color: ConfigColor,
+    pub warm_color: ConfigColor,
 }
