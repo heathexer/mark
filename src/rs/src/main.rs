@@ -12,6 +12,7 @@ pub mod config;
 pub mod countdown;
 pub mod life;
 pub mod presence;
+pub mod server;
 pub mod time;
 pub mod weather;
 
@@ -50,14 +51,22 @@ fn main() {
     let mut ww = WeatherWidget::new((32, 15), (30, 16), &config.weather_options);
     ww.start_thread(wsender);
 
+    let (ssender, sreceiver) = mpsc::sync_channel(20);
+    let mut flag = true;
+    let _rt = crate::server::start_server(ssender);
+
     loop {
         canvas.clear();
 
-        lw.render(&mut canvas);
-        tw.render(&mut canvas);
-        cw.render(&mut canvas);
-        pw.render(&mut canvas, &preceiver);
-        ww.render(&mut canvas, &wreceiver);
+        if flag {
+            lw.render(&mut canvas);
+            tw.render(&mut canvas);
+            cw.render(&mut canvas);
+            pw.render(&mut canvas, &preceiver);
+            ww.render(&mut canvas, &wreceiver);
+        }
+
+        crate::server::update_server(&sreceiver, &mut flag);
 
         canvas = matrix.swap(canvas);
     }

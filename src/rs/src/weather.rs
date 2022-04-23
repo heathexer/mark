@@ -99,35 +99,56 @@ impl WeatherWidget {
             // Temp °
             let temp = weather_info.main.temp;
             let text = format!("{:.0}°F", &temp);
+            let (temp_min, temp_max) = (weather_info.main.temp_min, weather_info.main.temp_max);
+            // let (temp_min, temp_max) = (35.0, 85.0);
+            let text_min = format!("{:.0}", &temp_min);
+            let text_max = format!("{:.0}", &temp_max);
+            let (scale_min, scale_max) = (40, 80);
             canvas.draw_text(
                 &self.font,
                 &text,
                 px + sx - 5 * (text.len() as i32 - 1) + 2,
-                py + 7,
+                py + 8,
                 // Scale each RBG value from cold color to warm color propotional to where the current temp lies between 32 and 100 F
-                &LedColor {
-                    red: Self::scale_to_range(
-                        temp,
-                        32,
-                        100,
-                        self.cold_color.red,
-                        self.warm_color.red,
-                    ),
-                    green: Self::scale_to_range(
-                        temp,
-                        32,
-                        100,
-                        self.cold_color.green,
-                        self.warm_color.green,
-                    ),
-                    blue: Self::scale_to_range(
-                        temp,
-                        32,
-                        100,
-                        self.cold_color.blue,
-                        self.warm_color.blue,
-                    ),
-                },
+                &Self::scale_color(
+                    temp,
+                    scale_min,
+                    scale_max,
+                    &self.cold_color,
+                    &self.warm_color,
+                ),
+                0,
+                false,
+            );
+
+            canvas.draw_text(
+                &self.font,
+                &text_min,
+                px + 5,
+                py + 16,
+                &Self::scale_color(
+                    temp_min,
+                    scale_min,
+                    scale_max,
+                    &self.cold_color,
+                    &self.warm_color,
+                ),
+                0,
+                false,
+            );
+
+            canvas.draw_text(
+                &self.font,
+                &text_max,
+                px + 20,
+                py + 16,
+                &Self::scale_color(
+                    temp_max,
+                    scale_min,
+                    scale_max,
+                    &self.cold_color,
+                    &self.warm_color,
+                ),
                 0,
                 false,
             );
@@ -160,10 +181,10 @@ impl WeatherWidget {
             let lat = Arc::clone(&self.lat);
             let lon = Arc::clone(&self.lon);
             let api_key = Arc::clone(&self.api_key);
-            // dbg!(&self.default_icon);
 
             move || loop {
                 let weather = Self::get_weather(&lat, &lon, &api_key);
+                dbg!(&weather);
                 chan.send(weather);
                 thread::sleep(Duration::new(600, 0));
             }
@@ -177,7 +198,15 @@ impl WeatherWidget {
     }
 
     fn scale_to_range(n: f32, in0: u8, in1: u8, out0: u8, out1: u8) -> u8 {
-        let scale = (n - in0 as f32) / (in1 as f32 - n);
-        (scale * (out1 - out0) as f32) as u8 + out0
+        let scale = (n - in0 as f32) / (in1 - in0) as f32;
+        (scale * (out1 as f32 - out0 as f32) + out0 as f32) as u8
+    }
+
+    fn scale_color(n: f32, in0: u8, in1: u8, c0: &LedColor, c1: &LedColor) -> LedColor {
+        LedColor {
+            red: Self::scale_to_range(n, in0, in1, c0.red, c1.red),
+            green: Self::scale_to_range(n, in0, in1, c0.green, c1.green),
+            blue: Self::scale_to_range(n, in0, in1, c0.blue, c1.blue),
+        }
     }
 }

@@ -1,15 +1,15 @@
-FROM balenalib/raspberry-pi-debian:buster
+FROM balenalib/raspberrypi4-64:buster
 
 # Installations
 RUN apt-get -q update && apt-get install -yq --no-install-recommends \
     build-essential git \
     vim curl \
-    python3-dev python3-pillow python3-numpy \
+    # python3-dev python3-pillow python3-numpy \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Get Rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y \
-    --default-host armv7-unknown-linux-gnueabihf \
+    --default-host aarch64-unknown-linux-gnu \
     --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
@@ -30,5 +30,4 @@ WORKDIR /src/app/rs
 # Build Rust app
 RUN cargo build --release || true
 
-    
 CMD cargo run --release || bash
