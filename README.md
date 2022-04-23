@@ -1,7 +1,8 @@
 # mark
 A clock/smart display for the standard rpi-led-matrix (using [this Rust crate](https://crates.io/crates/rpi-led-matrix)) with various widgets and simulation(s, eventually).
 
-![Example clip](example.mp4)
+https://github.com/heathexer/mark/blob/main/example.mp4?raw=true
+
 # Widgets
 Each widget has a size and position which is set on the creation of its struct. In addition, widgets with a background process must be passed a channel which is used to communicate with its main process.
 
